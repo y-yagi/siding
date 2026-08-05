@@ -1,0 +1,11 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0"
+gem "sqlite3", ">= 2.1"
+gem "puma"
+
+group :development, :test do
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
+  gem "watchcat", "~> 0.6"
+  gem "rspec", "~> 3.13"
+end

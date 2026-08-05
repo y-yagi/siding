@@ -1,0 +1,14 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+Gemfile.lock
+
+# Personal Claude Code permission grants; not shared with collaborators.
+# The glob also covers the .tmp.<pid>.<hash> files written during atomic saves --
+# those are the same content and are easy to stage by accident with `git add -A`.
+/.claude/settings.local.json*

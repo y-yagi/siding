@@ -1,0 +1,9 @@
+# The fixture is a real application, so it produces real per-machine artefacts. None of them
+# belong in the repository -- and a stray sqlite3 file committed here would make the staleness
+# tests depend on whatever state the last developer left behind.
+/storage/*.sqlite3*
+/log/*
+/tmp/*
+!/storage/.keep
+!/log/.keep
+!/tmp/.keep

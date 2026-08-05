@@ -1,0 +1,82 @@
+name: Ruby
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      invocations:
+        description: >-
+          Invocations per run. At least 500 is required; lowering it is for debugging this
+          workflow, not for satisfying the criterion.
+        required: false
+        default: '500'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    name: Ruby ${{ matrix.ruby }} on ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ruby:
+          - '3.2'
+          - '3.3'
+          - '3.4'
+          - '4.0'
+        include:
+          - os: macos-latest
+            ruby: '4.0'
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Unit and integration tests
+        run: bundle exec rake test
+      - name: Interactive fidelity (pty)
+        run: bundle exec rake test:pty
+
+  soak:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    name: Soak on ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+      - name: Soak
+        env:
+          SIDING_SOAK_INVOCATIONS: ${{ inputs.invocations }}
+        run: bundle exec rake test:soak
